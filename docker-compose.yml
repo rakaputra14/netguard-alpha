@@ -1,0 +1,67 @@
+services:
+  # 1. The PHP-FPM Service (Your Laravel App)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: netguard_alpha
+    restart: always
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+      - ./.env:/var/www/.env
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9000"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - laravel_network
+
+  # 2. The Web Server Service
+  webserver:
+    image: nginx:alpine
+    container_name: nginx_server
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www
+      - ./docker-compose/nginx:/etc/nginx/conf.d
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - laravel_network
+
+  # 3. The Database Service
+  db:
+    image: mysql:8.0
+    container_name: netguard_alpha_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: netguard_db
+      MYSQL_USER: netguard_user
+      MYSQL_PASSWORD: user_pass
+      MYSQL_ROOT_PASSWORD: groot1234
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - laravel_network
+
+# Define the network so they can talk
+networks:
+  laravel_network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
