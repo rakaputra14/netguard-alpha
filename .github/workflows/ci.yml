@@ -1,0 +1,26 @@
+name: Netguard-Alpha CI
+
+on:
+  push:
+    branches: [ "main" ]
+jobs:
+  laravel-docker-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create .env
+        run: cp .env.example .env
+
+      - name: Build and Orchestrate
+        run: docker compose up -d --build
+
+      - name: Verify Container Health
+        run: docker compose ps
+
+      - name: Run Artisan Check
+        run: docker compose exec -T app php artisan --version
+
+      - name: Shutdown
+        run: docker compose down -v
