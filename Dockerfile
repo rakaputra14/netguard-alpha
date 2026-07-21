@@ -67,8 +67,8 @@ COPY --from=asset-compiler /app/public ./public
 # Storage linking
 RUN php artisan storage:link --force
 # Permission setting for php-fpm
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache /var/www/public \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache /var/www/public
 # Copy the entrypoint script and make it executable
 RUN mv /var/www/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
