@@ -1,14 +1,29 @@
 services:
-  # 1. The PHP-FPM Service (Your Laravel App)
+  # migration
+  migrator:
+    build:
+      context: .
+      target: app
+    restart: "no"
+    working_dir: /var/www
+    volumes:
+      - ./.env:/var/www/.env
+    command: php artisan migrate --force
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - laravel_network
+
+  # PHP-FPM Service
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      target: app
     container_name: netguard_alpha
     restart: always
     working_dir: /var/www
     volumes:
-      - .:/var/www
       - ./.env:/var/www/.env
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "9000"]
@@ -19,34 +34,35 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
     networks:
       - laravel_network
 
-  # 2. The Web Server Service
+  # The Web Server Service
   webserver:
-    image: nginx:alpine
+    build:
+      context: .
+      target: web
     container_name: nginx_server
     ports:
       - "80:80"
-    volumes:
-      - .:/var/www
-      - ./docker-compose/nginx:/etc/nginx/conf.d
     depends_on:
       app:
         condition: service_healthy
     networks:
       - laravel_network
 
-  # 3. The Database Service
+  # The Database Service
   db:
     image: mysql:8.0
     container_name: netguard_alpha_db
     restart: always
     environment:
-      MYSQL_DATABASE: netguard_db
-      MYSQL_USER: netguard_user
-      MYSQL_PASSWORD: user_pass
-      MYSQL_ROOT_PASSWORD: groot1234
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
       - dbdata:/var/lib/mysql
     healthcheck:
