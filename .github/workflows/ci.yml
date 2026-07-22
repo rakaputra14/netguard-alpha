@@ -26,7 +26,7 @@ jobs:
       - name: Debug DB Failure
         if: failure() # Only runs if a previous step failed
         run: |
-          docker compose logs netguard_alpha_db
+          docker compose logs db
           docker inspect netguard_alpha_db --format='{{json .State.Health}}'
 
       - name: Verify Container Health
