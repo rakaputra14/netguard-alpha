@@ -23,7 +23,9 @@ jobs:
         if: failure() # Only runs if a previous step failed
         run: |
           docker compose logs db
+          docker compose logs migrator
           docker inspect netguard_alpha_db --format='{{json .State.Health}}'
+          docker inspect migration --format='{{json .State.Health}}'
 
       - name: Verify Container Health
         run: docker compose ps
