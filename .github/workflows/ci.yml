@@ -20,14 +20,14 @@ jobs:
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
           echo "DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}" >> .env
 
-        env:
-          DB_DATABASE: ${{ secrets.DB_DATABASE }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
-
       - name: Build and Orchestrate
         run: docker compose -f docker-compose.yml up -d --build
+      
+      - name: Debug DB Failure
+        if: failure() # Only runs if a previous step failed
+        run: |
+          docker compose logs netguard_alpha_db
+          docker inspect netguard_alpha_db --format='{{json .State.Health}}'
 
       - name: Verify Container Health
         run: docker compose ps
