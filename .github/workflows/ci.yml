@@ -10,6 +10,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Verify secrets
+        run: |
+          echo "DB_DATABASE is set: ${{ secrets.DB_DATABASE != '' }}"
+          echo "DB_ROOT_PASSWORD is set: ${{ secrets.DB_ROOT_PASSWORD != '' }}"
+
       - name: Create .env
         run: | 
           cp .env.example .env
