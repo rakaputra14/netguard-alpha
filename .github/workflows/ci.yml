@@ -19,11 +19,11 @@ jobs:
         run: | 
           cp .env.example .env
 
-          echo "APP_KEY=${{ secrets.APP_KEY }}" >> .env
-          echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
-          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-          echo "DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}" >> .env
+          echo "CI_TEST_ENV=${{ secrets.APP_KEY }}" >> .env
+          echo "CI_TEST_ENV=${{ secrets.DB_DATABASE }}" >> .env
+          echo "CI_TEST_ENV=${{ secrets.DB_USERNAME }}" >> .env
+          echo "CI_TEST_ENV=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "CI_TEST_ENV=${{ secrets.DB_ROOT_PASSWORD }}" >> .env
 
       - name: Build and Orchestrate
         run: docker compose -f docker-compose.yml up -d --build
