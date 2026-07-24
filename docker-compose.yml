@@ -6,9 +6,7 @@ services:
       target: app
     container_name: migration
     restart: "no"
-    working_dir: /var/www
-    volumes:
-      - ./.env:/var/www/.env
+    env_file: .env
     command: php artisan migrate --force
     depends_on:
       db:
@@ -24,8 +22,7 @@ services:
     container_name: netguard_alpha
     restart: always
     working_dir: /var/www
-    volumes:
-      - ./.env:/var/www/.env
+    env_file: .env
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "9000"]
       interval: 15s

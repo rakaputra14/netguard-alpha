@@ -11,11 +11,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create .env
-        run: | 
-          cp .env.example .env
-
-          echo "${{ secrets.CI_TEST_ENV }}" > .env
-
+        env:
+          CI_ENV_DATA: ${{ secrets.CI_TEST_ENV }}
+        run: echo "$CI_ENV_DATA" > .env
+        
       - name: Build and Orchestrate
         run: docker compose -f docker-compose.yml up -d --build
       
